@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  fraud-detection-api:
+    build: .
+    container_name: upi-fraud-detection-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./frontend:/app/frontend
+    environment:
+      - DEBUG=True
+      - LOG_LEVEL=INFO
+      - FRAUD_THRESHOLD=0.7
+      - MIN_TRANSACTION_AMOUNT=10000
+      - GNN_ENABLED=True
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Optional: Add Redis for caching
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: fraud-detection-redis
+  #   ports:
+  #     - "6379:6379"
+  #   restart: unless-stopped
+
+  # Optional: Add Prometheus for monitoring
+  # prometheus:
+  #   image: prom/prometheus:latest
+  #   container_name: fraud-detection-prometheus
+  #   ports:
+  #     - "9090:9090"
+  #   volumes:
+  #     - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+  #   restart: unless-stopped
+
+
+
